@@ -162,6 +162,21 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "work
 }
 
 
+resource "azurerm_monitor_diagnostic_setting" "avd-hostpool" {
+  name               = "AVD - Diagnostics"
+  target_resource_id = azurerm_virtual_desktop_host_pool.avd-hp.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.laws.id
+
+  log {
+    category = "Error"
+    enabled  = true
+
+    retention_policy {
+      enabled = false
+    }
+  }
+}
+
 resource "azurerm_network_interface" "sessionhost_nic" {
   count = var.avd_sessionhost_count
 
@@ -211,20 +226,6 @@ resource "azurerm_windows_virtual_machine" "avd_sessionhost" {
   }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "avd-hostpool" {
-  name               = "AVD - Diagnostics"
-  target_resource_id = azurerm_virtual_desktop_host_pool.avd-hp.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.laws.id
-
-  log {
-    category = "Error"
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
-  }
-}
 
 resource "azurerm_virtual_machine_extension" "AADLoginForWindows" {
   count = var.avd_sessionhost_count
@@ -267,6 +268,4 @@ resource "azurerm_virtual_machine_extension" "AVDModule" {
         }
     }
 SETTINGS
-
-
 }
