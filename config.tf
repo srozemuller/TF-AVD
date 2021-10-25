@@ -270,9 +270,11 @@ resource "azurerm_virtual_machine_extension" "AVDModule" {
         }
     }
 SETTINGS
-  protected_settings = <<SETTINGS
-        "Properties" : {
-          "registrationInfoToken" : "${local.registration_token}"
-        }
-SETTINGS
+  protected_settings = <<PROTECTED_SETTINGS
+  {
+    "properties": {
+      "registrationInfoToken": "${local.registration_token}"
+    }
+  }
+PROTECTED_SETTINGS
 }
