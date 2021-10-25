@@ -253,8 +253,8 @@ resource "azurerm_virtual_machine_extension" "AVDModule" {
   type_handler_version = "2.73"
   settings = <<SETTINGS
     {
-        "modulesUrl": '"https:////wvdportalstorageblob.blob.core.windows.net//galleryartifacts//Configuration_6-1-2021.zip"'
-        "ConfigurationFunction": '"Configuration.ps1\\AddSessionHost"'
+        "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_6-1-2021.zip"
+        "ConfigurationFunction": "Configuration.ps1\AddSessionHost"
         "Properties" : {
           "hostPoolName" : "${azurerm_virtual_desktop_host_pool.avd-hp.name}"
           "registrationInfoToken" : "${azurerm_virtual_desktop_host_pool.avd-hp.registration_info[0].token}"
