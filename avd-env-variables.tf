@@ -17,7 +17,7 @@ variable "init_rg_name" {
 variable "init_vm_name" {
     type      = string
   default     = "vm-init"
-  }
+}
 
 variable "vnet_name" {
   type        = string
