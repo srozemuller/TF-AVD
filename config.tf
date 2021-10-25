@@ -254,7 +254,7 @@ resource "azurerm_virtual_machine_extension" "AVDModule" {
   settings = <<SETTINGS
     {
         "modulesUrl": '"https:////wvdportalstorageblob.blob.core.windows.net//galleryartifacts//Configuration_6-1-2021.zip"'
-        "ConfigurationFunction": "Configuration.ps1\\\\AddSessionHost"
+        "ConfigurationFunction": '"Configuration.ps1\\AddSessionHost"'
         "Properties" : {
           "hostPoolName" : "${azurerm_virtual_desktop_host_pool.avd-hp.name}"
           "registrationInfoToken" : "${azurerm_virtual_desktop_host_pool.avd-hp.registration_info[0].token}"
