@@ -103,12 +103,13 @@ resource "azurerm_shared_image" "sig_def" {
   }
 }
 resource "azurerm_shared_image_version" "sig_version" {
+
   name                = formatdate("YYYY.MM.DD", timestamp())
   gallery_name        = azurerm_shared_image_gallery.sig.name
   image_name          = azurerm_shared_image.sig_def.name
   resource_group_name = azurerm_shared_image.sig_def.resource_group_name
   location            = azurerm_shared_image.sig_def.location
-  managed_image_id    = data.azurerm_resources.initVM.resources.id
+  managed_image_id    = data.azurerm_resources.initVM.resources[0].id
   
   target_region {
     name                   = azurerm_shared_image_gallery.sig.location
