@@ -257,7 +257,7 @@ resource "azurerm_virtual_machine_extension" "AVDModule" {
         "ConfigurationFunction": "Configuration.ps1\\AddSessionHost"
         "Properties" : {
           "hostPoolName" : "${azurerm_virtual_desktop_host_pool.avd-hp.name}"
-          "registrationInfoToken" : "${azurerm_virtual_desktop_host_pool.avd-hp.registration_info.token}"
+          "registrationInfoToken" : "${azurerm_virtual_desktop_host_pool.avd-hp.registration_info[0].token}"
           "aadJoin": true
         }
     }
