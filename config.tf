@@ -22,7 +22,7 @@ data "azurerm_resources" "initVM" {
   resource_group_name = var.init_rg_name
 }
 
-output "intiVm" {
+output "initVm" {
   value = data.azurerm_resources.initVM.id
 }
 resource "random_string" "string" {
@@ -110,7 +110,7 @@ resource "azurerm_shared_image_version" "sig_version" {
   image_name          = azurerm_shared_image.sig_def.name
   resource_group_name = azurerm_shared_image.sig_def.resource_group_name
   location            = azurerm_shared_image.sig_def.location
-  managed_image_id    = data.azurerm_resources.initVM.id
+  managed_image_id    = module.output.initVm
   
   target_region {
     name                   = azurerm_shared_image_gallery.sig.location
@@ -203,7 +203,7 @@ resource "azurerm_windows_virtual_machine" "avd_sessionhost" {
     storage_account_type = "Premium_LRS"
   }
 
-  source_image_id = azurerm_shared_image_version.sig_version.id
+  source_image_id = var.
 
   tags = {
     environment = "Production"
