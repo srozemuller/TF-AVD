@@ -237,7 +237,7 @@ resource "azurerm_virtual_machine_extension" "AADLoginForWindows" {
   publisher            = "Microsoft.Azure.ActiveDirectory"
   type                 = "AADLoginForWindows"
   type_handler_version = "1.0"
-    settings = <<SETTINGS
+  settings = <<SETTINGS
     {
       "mdmId": "0000000a-0000-0000-c000-000000000000"
     }
