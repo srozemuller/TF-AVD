@@ -203,7 +203,7 @@ resource "azurerm_windows_virtual_machine" "avd_sessionhost" {
     storage_account_type = "Premium_LRS"
   }
 
-  source_image_id = var.
+  source_image_id = azurerm_shared_image_version.sig_version.id
 
   tags = {
     environment = "Production"
