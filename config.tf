@@ -11,11 +11,12 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
 resource "random_integer" "random" {
   min = 1
   max = 50000
 }
-# Get resources by type, create spoke vNet peerings
+
 data "azurerm_resources" "initVM" {
   type = "Microsoft.Compute/virtualMachines"
   name = var.init_vm_name
@@ -40,7 +41,7 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = azurerm_resource_group.rg-avd.name
   address_space       = var.vnet_address_space
   tags = {
-    environment = "Terraform test"
+    environment = "Bloody Harry Enviroment"
   }
 }
 
@@ -236,5 +237,31 @@ resource "azurerm_virtual_machine_extension" "AADLoginForWindows" {
   publisher            = "Microsoft.Azure.ActiveDirectory"
   type                 = "AADLoginForWindows"
   type_handler_version = "1.0"
+}
+
+resource "azurerm_virtual_machine_extension" "AVDModule" {
+  count = var.avd_sessionhost_count
+  depends_on = [
+      azurerm_windows_virtual_machine.avd_sessionhost,
+      azurerm_virtual_machine_extension.AADLoginForWindows
+  ]
+
+  name                 = "Microsoft.PowerShell.DSC"
+  virtual_machine_id   = "${azurerm_resource_group.rg-avd.id}/providers/Microsoft.Compute/virtualMachines/${var.avd_sessionhost_prefix}-${count.index}"
+  publisher            = "Microsoft.Powershell"
+  type                 = "DSC"
+  type_handler_version = "2.73"
+    settings = <<SETTINGS
+    {
+        "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_6-1-2021.zip"
+        "ConfigurationFunction": "Configuration.ps1\\AddSessionHost"
+        "Properties" : {
+          "hostPoolName" : "${azurerm_virtual_desktop_host_pool.avd-hp.name}"
+          "registrationInfoToken" : "${azurerm_virtual_desktop_host_pool.avd-hp.registration_info.token}"
+          "aadJoin": true
+        }
+    }
+SETTINGS
+
 
 }
