@@ -3,6 +3,11 @@ variable "avd_rg_name" {
   default     = "rg-roz-bloody-harry"
 }
 
+variable "avd_rg_location" {
+  type        = string
+  default     = "West Europe"
+}
+
 
 variable "init_rg_name" {
   type        = string
