@@ -110,7 +110,7 @@ resource "azurerm_shared_image_version" "sig_version" {
   image_name          = azurerm_shared_image.sig_def.name
   resource_group_name = azurerm_shared_image.sig_def.resource_group_name
   location            = azurerm_shared_image.sig_def.location
-  managed_image_id    = module.output.initVm
+  managed_image_id    = module.azurerm_resources.initVM
   
   target_region {
     name                   = azurerm_shared_image_gallery.sig.location
