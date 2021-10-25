@@ -244,6 +244,9 @@ resource "azurerm_virtual_machine_extension" "AADLoginForWindows" {
     }
 SETTINGS
 }
+locals {
+  registration_token = azurerm_virtual_desktop_host_pool.avd-hp.registration_info[0].token
+}
 
 resource "azurerm_virtual_machine_extension" "AVDModule" {
   count = var.avd_sessionhost_count
@@ -263,9 +266,13 @@ resource "azurerm_virtual_machine_extension" "AVDModule" {
         "ConfigurationFunction": "Configuration.ps1\\AddSessionHost",
         "Properties" : {
           "hostPoolName" : "${azurerm_virtual_desktop_host_pool.avd-hp.name}",
-          "registrationInfoToken" : "${md5(azurerm_virtual_desktop_host_pool.avd-hp.registration_info[0].token)}",
           "aadJoin": true
         }
     }
+SETTINGS
+  protected_settings = <<SETTINGS
+        "Properties" : {
+          "registrationInfoToken" : "${local.registration_token}"
+        }
 SETTINGS
 }
