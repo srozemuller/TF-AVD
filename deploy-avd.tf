@@ -287,7 +287,7 @@ resource "azuread_group" "aad_group" {
   security_enabled = true
 }
 resource "azurerm_role_assignment" "role" {
-  scope              = azurerm_virtual_desktop_application_group.dag.id
+  scope              = azurerm_virtual_desktop_application_group.desktopapp.id
   role_definition_id = data.azurerm_role_definition.role.id
   principal_id       = azuread_group.aad_group.id
 }
