@@ -8,7 +8,7 @@ vnet_name = "vnet-roz-bh-001"
 vnet_address_space = ["10.0.0.0/16"]
 vnet_subnet_name = "DefaultSubnet"
 vnet_subnet_address = ["10.0.1.0/24"]
-vnet_vnet_nsg_name = "nsg-roz-bh-001"
+vnet_nsg_name = "nsg-roz-bh-001"
 
 # Diagnosics settings
 laws_name-prefix = "la-avd"
