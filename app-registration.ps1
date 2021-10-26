@@ -186,7 +186,7 @@ Connect-AzAccount
 $script:AzureUrl = "https://management.azure.com/"
 $script:mainUrl = "https://graph.microsoft.com/beta"
 $script:token = GetAuthToken -resource 'https://graph.microsoft.com'
-$AppDisplayName = "TerraForm Deployment-test1"
+$AppDisplayName = "TerraForm Deployment"
 $newApp = New-Application -AppDisplayName $AppDisplayName
 Add-ApplicationPermissions -AppId $newApp.Id -permissions $permissions 
 $newSp = New-SPFromApp -AppId $newApp.AppId 
