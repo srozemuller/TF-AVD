@@ -192,16 +192,42 @@ Add-ApplicationPermissions -AppId $newApp.Id -permissions $permissions
 $newSp = New-SPFromApp -AppId $newApp.AppId 
 Consent-ApplicationPermissions -ServicePrincipalId $newSp.id -ResourceId "3f73b7e5-80b4-4ca8-9a77-8811bb27eb70" -Scope "Group.ReadWrite.All"
 
-# Add contributor role at subscription level
+# Create contributor-plus role at subscription level
 $script:token = GetAuthToken -resource $script:AzureUrl
-$guid = (new-guid).guid
 $contributorRoleId = "b24988ac-6180-42a0-ab88-20f7382dd24c"
-$roleDefinitionId = "/subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleDefinitions/"+ $contributorRoleId
-$url = $script:AzureUrl + "subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleAssignments/$($guid)?api-version=2018-07-01"
+$rolesUrl = $script:AzureUrl + "subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleDefinitions/" + $contributorRoleId + "?api-version=2015-07-01"
+$roles = Invoke-RestMethod -Uri $rolesUrl -Method GET -headers $script:token
+$currentPerissions = [System.Collections.ArrayList]$roles.properties.permissions.notactions
+
+$newRoleguid = (new-guid).guid
+$newRoleUrl = $script:AzureUrl + "subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleDefinitions/" + $newRoleguid + "?api-version=2015-07-01" 
+
+$newRoleBody = @{
+    name = $newRoleguid
+    properties = @{
+        roleName = "Contributor Plus"
+        description = "Contributor WITH assign permissions"
+        type = "CustomRole"
+        permissions = @(
+            @{
+                actions = @("*")
+                notActions = $currentPerissions.Remove("Microsoft.Authorization/*/Write")
+            }
+        )
+        assignableScopes = @(
+            "/subscriptions/$($script:context.Subscription.Id)"
+        )
+    }
+}
+Invoke-RestMethod -Uri $newRoleUrl -Method PUT -body $($newRoleBody | ConvertTo-Json -Depth 4) -headers $script:token
+
+$assignGuid = (new-guid).guid
+$roleDefinitionId = "/subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleDefinitions/"+ $guid
+$url = $script:AzureUrl + "subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleAssignments/$($assignGuid)?api-version=2018-07-01"
 $body = @{
     properties = @{
         roleDefinitionId = $roleDefinitionId
-        principalId      = $servicePrincipal.id
+        principalId      = $newSp.id
     }
 }
 $jsonBody = $body | ConvertTo-Json -Depth 6
