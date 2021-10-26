@@ -11,7 +11,7 @@ vnet_subnet_address = ["10.0.1.0/24"]
 vnet_nsg_name = "nsg-roz-bh-001"
 
 # Diagnosics settings
-laws_name-prefix = "la-avd"
+laws_name-prefix = "laws-avd"
 avd_diagnostics_name = "AVD - Diagnostics"
 
 # Shared Image Gallery settings
@@ -43,6 +43,9 @@ avd_applicationgroup_type = "Desktop"
 avd_workspace_name = "Dutch-Workspace"
 avd_workspace_friendly_name = "Dutch-Workspace"
 avd_workspace_description = "Work from home"
+
+## Assign to group
+aad_group_name = "All Users"
 
 ## Sessionhosts AzureAD
 avd_sessionhost_count = 2

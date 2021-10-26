@@ -8,6 +8,10 @@ variable "avd_rg_location" {
   description = "This is the AVD resource groups location"
 }
 
+variable "aad_group_name" {
+  type        = string
+  description = "Which group do you like to assign"
+}
 
 variable "init_rg_name" {
   type        = string
