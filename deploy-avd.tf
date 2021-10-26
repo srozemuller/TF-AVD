@@ -23,7 +23,6 @@ data "azurerm_resources" "initVM" {
   resource_group_name = var.init_rg_name
 }
 
-
 resource "random_string" "string" {
   length           = 16
   special          = true
@@ -46,10 +45,10 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "defaultSubnet" {
-  name           = "defaultSubnet"
+  name           = var.vnet_subnet_name
   resource_group_name = azurerm_resource_group.rg-avd.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes = ["10.0.1.0/24"]
+  address_prefixes = var.vnet_subnet_address
 }
 
 resource "azurerm_network_security_group" "nsg" {
@@ -212,7 +211,7 @@ resource "azurerm_windows_virtual_machine" "avd_sessionhost" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "avd-hostpool" {
-  name               = "AVD - Diagnostics"
+  name               = var.avd_diagnostics_name
   target_resource_id = azurerm_virtual_desktop_host_pool.avd-hp.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.laws.id
 
@@ -262,6 +261,19 @@ resource "azurerm_virtual_machine_extension" "AVDModule" {
         }
     }
 SETTINGS
+}
 
+data "azuread_group" "allUsers" {
+  display_name     = "AllUsers"
+  security_enabled = true
+}
 
+data "azurerm_role_definition" "role" { 
+  name = "Desktop Virtualization User"
+}
+
+resource "azurerm_role_assignment" "role" {
+  scope              = azurerm_virtual_desktop_application_group.desktopapp.id
+  role_definition_id = data.azurerm_role_definition.role.id
+  principal_id       = azuread_group.aad_group.id
 }
