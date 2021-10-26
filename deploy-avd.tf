@@ -281,7 +281,8 @@ PROTECTED_SETTINGS
 
 
 data "azuread_group" "aad_group" {
-  name = var.aad_group_name
+  display_name = var.aad_group_name
+  security_enabled = true
 }
 data "azurerm_role_definition" "vm_user_login" {
   name = "Virtual Machine User Login"
