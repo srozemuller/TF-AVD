@@ -161,6 +161,21 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "work
 }
 
 
+resource "azurerm_monitor_diagnostic_setting" "avd-hostpool" {
+  name               = "AVD - Diagnostics"
+  target_resource_id = azurerm_virtual_desktop_host_pool.avd-hp.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.laws.id
+
+  log {
+    category = "Error"
+    enabled  = true
+
+    retention_policy {
+      enabled = false
+    }
+  }
+}
+
 resource "azurerm_network_interface" "sessionhost_nic" {
   count = var.avd_sessionhost_count
 
@@ -210,20 +225,6 @@ resource "azurerm_windows_virtual_machine" "avd_sessionhost" {
   }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "avd-hostpool" {
-  name               = var.avd_diagnostics_name
-  target_resource_id = azurerm_virtual_desktop_host_pool.avd-hp.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.laws.id
-
-  log {
-    category = "Error"
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
-  }
-}
 
 resource "azurerm_virtual_machine_extension" "AADLoginForWindows" {
   count = var.avd_sessionhost_count
@@ -236,6 +237,14 @@ resource "azurerm_virtual_machine_extension" "AADLoginForWindows" {
   publisher            = "Microsoft.Azure.ActiveDirectory"
   type                 = "AADLoginForWindows"
   type_handler_version = "1.0"
+  settings = <<SETTINGS
+    {
+      "mdmId": "0000000a-0000-0000-c000-000000000000"
+    }
+SETTINGS
+}
+locals {
+  registration_token = azurerm_virtual_desktop_host_pool.avd-hp.registration_info[0].token
 }
 
 resource "azurerm_virtual_machine_extension" "AVDModule" {
@@ -252,28 +261,19 @@ resource "azurerm_virtual_machine_extension" "AVDModule" {
   type_handler_version = "2.73"
   settings = <<SETTINGS
     {
-        "modulesUrl": '"https:////wvdportalstorageblob.blob.core.windows.net//galleryartifacts//Configuration_6-1-2021.zip"'
-        "ConfigurationFunction": '"Configuration.ps1\\AddSessionHost"'
+        "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_6-1-2021.zip",
+        "ConfigurationFunction": "Configuration.ps1\\AddSessionHost",
         "Properties" : {
-          "hostPoolName" : "${azurerm_virtual_desktop_host_pool.avd-hp.name}"
-          "registrationInfoToken" : "${azurerm_virtual_desktop_host_pool.avd-hp.registration_info[0].token}"
+          "hostPoolName" : "${azurerm_virtual_desktop_host_pool.avd-hp.name}",
           "aadJoin": true
         }
     }
 SETTINGS
-}
-
-data "azuread_group" "allUsers" {
-  display_name     = "AllUsers"
-  security_enabled = true
-}
-
-data "azurerm_role_definition" "role" { 
-  name = "Desktop Virtualization User"
-}
-
-resource "azurerm_role_assignment" "role" {
-  scope              = azurerm_virtual_desktop_application_group.desktopapp.id
-  role_definition_id = data.azurerm_role_definition.role.id
-  principal_id       = azuread_group.aad_group.id
+  protected_settings = <<PROTECTED_SETTINGS
+  {
+    "properties": {
+      "registrationInfoToken": "${local.registration_token}"
+    }
+  }
+PROTECTED_SETTINGS
 }
