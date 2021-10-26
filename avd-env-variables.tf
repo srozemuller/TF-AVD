@@ -1,135 +1,151 @@
 variable "avd_rg_name" {
   type        = string
-  default     = "rg-roz-bloody-harry"
+  description = "This is the AVD resource group"
 }
 
 variable "avd_rg_location" {
   type        = string
-  default     = "West Europe"
+  description = "This is the AVD resource groups location"
 }
 
 
 variable "init_rg_name" {
   type        = string
-  default     = "rg-temp-init"
+  description = "This is resource group where the initial VM for image creation lives"
 }
 
 variable "init_vm_name" {
-    type      = string
-  default     = "vm-init"
+    type        = string
+    description = "How is the initial VM for image creation called"
 }
 
 variable "vnet_name" {
   type        = string
-  default     = "vnet-roz-bh-001"
+  description = "What is the VNETs name"
 }
-variable "vnet_nsg_name" {
-  type        = string
-  default     = "nsg-roz-bh-001"
-}
-
 variable "vnet_address_space" {
   type        = list
-  default     = ["10.0.0.0/16"]
+  description = "What is the VNETs addresspace"
+}
+
+variable "vnet_subnet_name" {
+  type        = string
+  description = "What is the AVD subnet"
+}
+
+variable "vnet_subnet_address" {
+  type        = list
+  description = "What is the subnet addresspace"
+}
+
+
+variable "vnet_nsg_name" {
+  type        = string
+  description = "Network security group name"
 }
 
 variable "laws_name-prefix" {
   type        = string
-  default     = "la-avd"
+  description = "Enter the Loganalyics workspace name prefix"
 }
+variable "avd_diagnostics_name" {
+  type        = string
+  description = "How is the diagnosics settings in AVD called"
+}
+
+
 variable "sig_name" {
-  type = string
-  default = "Dutch_Gallery"
+  type        = string
+  description = "What is the Shared Image Galler name"
 }
 
 variable "sig_def_name" {
-  type = string
-  default = "Bloody-Harry"
+  type        = string
+  description = "How is the definition called"
 }
 
 variable "sig_def_type" {
-  type = string
-  default = "Windows"
+  type        = string
+  description = "What is the definitions type"
 }
 
 variable "sig_def_generation" {
-  type = string
-  default = "V2"
+  type        = string
+  description = "What is the HyperV generation, must be the same as the initial image."
 }
 variable "sig_def_publisher" {
-  type = string
-  default = "Rozemuller"
+  type        = string
+  description = "What is the image publisher"
 }
 
 variable "sig_def_offer" {
-  type = string
-  default = "Bloody"
+  type        = string
+  description = "What is the image offer"
 }
 
 variable "sig_def_sku" {
-  type = string
-  default = "Harry"
+  type        = string
+  description = "What is the image SKU"
 }
 
 variable "avd_hostpool_name" {
   type        = string
-  default     = "Roz-Dutch"
+  description = "What is de AVD hostpools name"
 }
 variable "avd_hostpool_friendly_name" {
   type        = string
-  default     = "The Dutch Bloody Harry"
+  description = "What is de AVD hostpools friendly name"
 }
 
 variable "avd_hostpool_description" {
   type        = string
-  default     = "An pumpking cocktail with some Dutch aroma's"
+  description = "What is the AVD hostpools description"
 }
 
 variable "avd_hostpool_type" {
   type        = string
-  default     = "Personal"
+  description = "What is the AVD hostpools type"
 }
 
 variable "avd_applicationgroup_name" {
   type        = string
-  default     = "Bloody-Apps"
+  description = "What is the AVD application group name"
 }
 
-variable "avd_applicationgroup_type" {
-  type        = string
-  default     = "Desktop"
-}
 variable "avd_applicationgroup_friendly_name" {
   type        = string
-  default     = "Bloody-Applications"
+  description = "What is the AVD application group friendly name"
 }
 
 variable "avd_applicationgroup_description" {
   type        = string
-  default     = "Some bloody applications"
+  description = "What is the AVD application group description"
+}
+
+variable "avd_applicationgroup_type" {
+  type        = string
+  description = "What is the AVD application group type"
 }
 
 variable "avd_workspace_name" {
   type        = string
-  default     = "Dutch-Workspace"
+  description = "What is the AVD workspace name"
 }
 variable "avd_workspace_friendly_name" {
   type        = string
-  default     = "Dutch-Workspace"
+  description = "What is the AVD workspace friendly name"
 }
 variable "avd_workspace_description" {
   type        = string
-  default     = "A Dutch workspace"
+  description = "What is the AVD description"
 }
 
 variable "avd_sessionhost_count" {
-  type = number
-  default = 2
+  type        = number
   description = "Number of session host to deploy at first time"
 }
 
 variable "avd_sessionhost_prefix" {
-  type = string
-  default = "avd"
+  type        = string
   description = "The sessionhosts prefix"
 }
