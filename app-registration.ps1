@@ -1,6 +1,3 @@
-$script:token = GetAuthToken -resource 'https://graph.microsoft.com' 
-$script:mainUrl = "https://graph.microsoft.com/beta"
-
 function GetAuthToken($resource) {
     $context = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile.DefaultContext
     $Token = [Microsoft.Azure.Commands.Common.Authentication.AzureSession]::Instance.AuthenticationFactory.Authenticate($context.Account, $context.Environment, $context.Tenant.Id.ToString(), $null, [Microsoft.Azure.Commands.Common.Authentication.ShowDialog]::Never, $null, $resource).AccessToken
@@ -65,7 +62,7 @@ function New-ApplicationPassword {
     }
     $postBody = $body | ConvertTo-Json
     $appPass = Invoke-RestMethod -Uri $url -Method POST -Body $postBody -Headers $script:token
-    return $appPass
+    $appPass
 }
 
 function Add-ApplicationPermissions {
@@ -183,20 +180,26 @@ $permissions = @{
 }
 
 Connect-AzAccount
+
 $script:AzureUrl = "https://management.azure.com/"
+$script:azureToken = GetAuthToken -resource $script:AzureUrl
+
 $script:mainUrl = "https://graph.microsoft.com/beta"
 $script:token = GetAuthToken -resource 'https://graph.microsoft.com'
-$AppDisplayName = "TerraForm Deployment"
+$script:context = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile.DefaultContext
+$AppDisplayName = "UK-UG-TerraForm"
 $newApp = New-Application -AppDisplayName $AppDisplayName
 Add-ApplicationPermissions -AppId $newApp.Id -permissions $permissions 
+$appPass = New-ApplicationPassword -AppId $newApp.id
 $newSp = New-SPFromApp -AppId $newApp.AppId 
+# ResourceID 3f73b7e5-80b4-4ca8-9a77-8811bb27eb70 is the GraphAggregatorService enterprise application objectId in 
 Consent-ApplicationPermissions -ServicePrincipalId $newSp.id -ResourceId "3f73b7e5-80b4-4ca8-9a77-8811bb27eb70" -Scope "Group.ReadWrite.All"
 
+
 # Create contributor-plus role at subscription level
-$script:token = GetAuthToken -resource $script:AzureUrl
 $contributorRoleId = "b24988ac-6180-42a0-ab88-20f7382dd24c"
 $rolesUrl = $script:AzureUrl + "subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleDefinitions/" + $contributorRoleId + "?api-version=2015-07-01"
-$roles = Invoke-RestMethod -Uri $rolesUrl -Method GET -headers $script:token
+$roles = Invoke-RestMethod -Uri $rolesUrl -Method GET -headers $script:azureToken
 $currentPerissions = [System.Collections.ArrayList]$roles.properties.permissions.notactions
 
 $newRoleguid = (new-guid).guid
@@ -205,7 +208,7 @@ $newRoleUrl = $script:AzureUrl + "subscriptions/" + $script:context.Subscription
 $newRoleBody = @{
     name = $newRoleguid
     properties = @{
-        roleName = "Contributor Plus"
+        roleName = "Contributor Plus UK Demo"
         description = "Contributor WITH assign permissions"
         type = "CustomRole"
         permissions = @(
@@ -219,10 +222,10 @@ $newRoleBody = @{
         )
     }
 }
-Invoke-RestMethod -Uri $newRoleUrl -Method PUT -body $($newRoleBody | ConvertTo-Json -Depth 4) -headers $script:token
+Invoke-RestMethod -Uri $newRoleUrl -Method PUT -body $($newRoleBody | ConvertTo-Json -Depth 4) -headers $script:azureToken
 
 $assignGuid = (new-guid).guid
-$roleDefinitionId = "/subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleDefinitions/"+ $guid
+$roleDefinitionId = "/subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleDefinitions/"+ $newRoleguid
 $url = $script:AzureUrl + "subscriptions/" + $script:context.Subscription.Id + "/providers/Microsoft.Authorization/roleAssignments/$($assignGuid)?api-version=2018-07-01"
 $body = @{
     properties = @{
@@ -231,10 +234,10 @@ $body = @{
     }
 }
 $jsonBody = $body | ConvertTo-Json -Depth 6
-Invoke-RestMethod -Uri $url -Method PUT -Body $jsonBody -headers $script:token
+Invoke-RestMethod -Uri $url -Method PUT -Body $jsonBody -headers $script:azureToken
 
 # Terraform environment variables are:
 Write-Host "ARM_TENANT_ID: "$script:context.Tenant.Id
 Write-Host "ARM_SUBSCRIPTION_ID: "$script:context.Subscription.Id
-Write-Host "ARM_CLIENT_ID: "$newApp.id
+Write-Host "ARM_CLIENT_ID: "$newApp.appid
 Write-Host "ARM_CLIENT_SECRET: "$appPass.secretText
