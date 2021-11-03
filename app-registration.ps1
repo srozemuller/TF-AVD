@@ -173,8 +173,8 @@ $permissions = @{
     resourceAppId  = "00000003-0000-0000-c000-000000000000"
     resourceAccess = @(
         @{
-            id   = "4e46008b-f24c-477d-8fff-7bb4ec7aafe0"
-            type = "Scope"
+            id   = "5b567255-7703-4780-807c-7be8301ae99b"
+            type = "Role"
         }
     )
 }
@@ -193,7 +193,7 @@ Add-ApplicationPermissions -AppId $newApp.Id -permissions $permissions
 $appPass = New-ApplicationPassword -AppId $newApp.id
 $newSp = New-SPFromApp -AppId $newApp.AppId 
 # ResourceID 3f73b7e5-80b4-4ca8-9a77-8811bb27eb70 is the GraphAggregatorService enterprise application objectId in 
-Consent-ApplicationPermissions -ServicePrincipalId $newSp.id -ResourceId "3f73b7e5-80b4-4ca8-9a77-8811bb27eb70" -Scope "Group.ReadWrite.All"
+Consent-ApplicationPermissions -ServicePrincipalId $newSp.id -ResourceId "3f73b7e5-80b4-4ca8-9a77-8811bb27eb70" -Scope "Group.Read.All"
 
 
 # Create contributor-plus role at subscription level
